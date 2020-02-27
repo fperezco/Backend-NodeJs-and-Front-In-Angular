@@ -1,12 +1,12 @@
 // Importamos librerias
 // My custom configuration
-require('./config');
+require('./config/config');
 // Express
 var express = require('express');
 //Mongoose
 var mongoose = require('mongoose');
-
-
+//Body parser para obtener parametros por get
+var bodyParser = require('body-parser');
 
 //--------------------------------------
 // INICIALIZACION
@@ -19,19 +19,15 @@ mongoose.connect(process.env.URLDB, (err, res) => {
     if (err) throw err;
     console.log('Base de datos: \x1b[32m%s\x1b[0m', 'online');
 });
+//Body Parser
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }))
+// parse application/json
+//app.use(bodyParser.json())
+
     
-
-
-
 // Rutas
-app.get('/', (req, res, next) => {
-
-    res.status(200).json({
-        ok: true,
-        mensaje : "Petición oki"
-    });
-
-});
+app.use(require('./routes/routes'));
 
 // Escuchar peticiones
 app.listen(process.env.PORT, () => {

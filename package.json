@@ -10,7 +10,10 @@
   "author": "Fco Perez",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^4.0.0",
     "express": "^4.17.1",
-    "mongoose": "^5.9.2"
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.2",
+    "mongoose-unique-validator": "^2.0.3"
   }
 }
