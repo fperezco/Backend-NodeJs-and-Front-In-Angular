@@ -13,7 +13,7 @@ let verificaToken = (req, res, next) => {
     //si lo quieres recibir por el authorization bearer
     //var token1 = req.headers.authorization.split(" ")[1];
     //var token1 = req.get('authorization'); y hacer el split
-    console.log("EL TOKEN ES",token1);
+    //console.log("EL TOKEN ES",token1);
 
     jwt.verify(token, process.env.JWT_SEED, (err, decode) => {
 

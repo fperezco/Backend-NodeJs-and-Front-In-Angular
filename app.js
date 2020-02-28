@@ -1,12 +1,12 @@
 // Importamos librerias
 // My custom configuration
-require('./config/config');
+require("./config/config");
 // Express
-var express = require('express');
+var express = require("express");
 //Mongoose
-var mongoose = require('mongoose');
+var mongoose = require("mongoose");
 //Body parser para obtener parametros por get
-var bodyParser = require('body-parser');
+var bodyParser = require("body-parser");
 
 //--------------------------------------
 // INICIALIZACION
@@ -16,22 +16,22 @@ var bodyParser = require('body-parser');
 var app = express();
 //Conectar a la BD
 mongoose.connect(process.env.URLDB, (err, res) => {
-    if (err) throw err;
-    console.log('Base de datos: \x1b[32m%s\x1b[0m', 'online');
+  if (err) throw err;
+  console.log("Base de datos: \x1b[32m%s\x1b[0m", "online");
 });
 //Body Parser
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.urlencoded({ extended: false }));
 // parse application/json
 //app.use(bodyParser.json())
 
-    
 // Rutas
-app.use(require('./routes/routes'));
+app.use(require("./routes/routes"));
 
 // Escuchar peticiones
 app.listen(process.env.PORT, () => {
-    console.log('Express on port '+process.env.PORT+': \x1b[32m%s\x1b[0m', 'online');
+  console.log(
+    "Express on port " + process.env.PORT + ": \x1b[32m%s\x1b[0m",
+    "online"
+  );
 });
-
-
