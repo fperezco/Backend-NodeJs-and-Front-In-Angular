@@ -1,5 +1,6 @@
 // Express
 var express = require("express");
+
 // Schema usuario
 var Usuario = require("../models/usuario");
 //encriptar pass
@@ -12,6 +13,9 @@ const { verificaToken } = require("../middlewares/autenticacion");
 
 // Inicializar variables
 var app = express();
+
+
+
 
 // ====================================
 // Rutas
@@ -60,13 +64,19 @@ app.get("/usuarios", (req, res, next) => {
 /**
  * Almacenar un usuario
  */
-app.post("/usuarios", [verificaToken], (req, res) => {
+//app.post("/usuarios", [verificaToken], (req, res) => {
+  //para registar un usuario no es necesario el token
+app.post("/usuarios", (req, res) => {
   //recogemos los parametros por post haciendo uso de un paquete llamado
   //npm body-parser
   let body = req.body;
 
   //o usar try catch....
   //verificarInput(res,body);
+  console.log("creando usuario, body = ", body);
+  //console.log("creando usuario, body = ", req);
+
+  
 
   //creamos el objeto
   let usuario = new Usuario({
@@ -84,7 +94,8 @@ app.post("/usuarios", [verificaToken], (req, res) => {
       return res.status(400).json({
         ok: false,
         mensaje: "Error al crear el usuario",
-        err
+        err,
+        usuario: usuario
       });
     }
 

@@ -22,6 +22,8 @@ app.post('/login', function(req, res) {
 
     let body = req.body;
 
+    console.log("login viene",body);
+
     //vemos si existe el mail
     Usuario.findOne({ email: body.email }, (err, usuarioDB) => {
 
