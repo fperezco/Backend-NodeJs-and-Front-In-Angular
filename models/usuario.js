@@ -20,7 +20,8 @@ var usuarioSchema = new Schema({
     required: true,
     default: "USER_ROLE",
     enum: rolesValidos
-  }
+  },
+  google: { type:Boolean, required:true, default: false}
 });
 
 //actualizamos este metodo automatico para que no devuelva el password

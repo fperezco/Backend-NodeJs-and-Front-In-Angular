@@ -5,6 +5,9 @@ const Usuario = require('../models/usuario');
 const bcrypt = require('bcrypt');
 //el jwt
 const jwt = require('jsonwebtoken');
+//CORS
+const cors = require('cors');
+
 
 //para login con google
 const { OAuth2Client } = require('google-auth-library');
@@ -14,7 +17,8 @@ const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 //Inicializamos
 const app = express();
-
+//CORS
+app.use(cors());
 
 //ruta de login, recibe por post mail y password
 //login standard
@@ -91,14 +95,17 @@ async function verify(token) {
     console.log("EEEEEEEEEEEOOOOOOOOOOOOO");
     console.log(payload.name);
     console.log(payload.email);
+    console.log(payload);
 
     //devuelvo un objeto parecido al de mi sistema sin password
     return {
         nombre: payload.name,
         email: payload.email,
         img: payload.picture,
-        google: true
+        google: true,
+        id: payload.sub
     }
+
 }
 
 
@@ -108,7 +115,9 @@ app.post('/google', async(req, res) => {
 
     //recojo el id_token despues del login con google
     let token = req.body.token;
+    console.log("viene token de google",req.body);
 
+    //extraigo los datos del token usando el servicio de google
     let googleUser = await verify(token)
         .catch(error => {
             return res.status(403).json({
@@ -134,12 +143,12 @@ app.post('/google', async(req, res) => {
 
         //un tio k tiene ese mail pero no se autentico con google
         if (usuarioDB) {
-            if (!usuarioDB.google) {
+            if (!usuarioDB.google) { //existe el usuario pero no fue creado por google => que lo haga normal
 
                 return res.status(400).json({
                     ok: false,
                     err: {
-                        message: "debe usar su autenticacion normal y no la de google ya que es usuario del sistema con ese mail"
+                        message: "debe usar su autenticacion normal y no la de google ya que es usuario del sistema con ese mail y no se registro con google"
                     }
                 });
             } else { //ES UN USER DE GOOGLE K SE LOGUEA => RENUEVO SU TOKEN COMO EN UN LOGIN NORMAL SIN GOOGLE
@@ -150,27 +159,29 @@ app.post('/google', async(req, res) => {
 
                 return res.json({
                     ok: true,
+                    id: usuarioDB.id,
                     usuario: usuarioDB,
                     token
-                })
+                });
 
 
             }
         } else //el usuario no existe => se loguea y he de crearlo en mi BD
-        {
+        {       // esto no lo entiendo pk luego no se podria volver a loguear con google, solo la primera vez
             let usuario = new Usuario();
 
             usuario.nombre = googleUser.nombre;
             usuario.email = googleUser.email;
-            usuario.img = googleUser.picture;
+            usuario.img = googleUser.img;
             usuario.google = true;
             usuario.password = ':)';
 
             //guardamos el user
             usuario.save((err, usuarioDB) => {
                 if (err) {
-                    return res.status(400).json({
+                    return res.status(500).json({
                         ok: false,
+                        mensaje :" error al crear el usuario",
                         err
                     });
                 }
@@ -180,11 +191,12 @@ app.post('/google', async(req, res) => {
                     usuario: usuarioDB //es el payload
                 }, process.env.JWT_SEED, { expiresIn: process.env.JWT_CADUCIDAD_TOKEN });
 
-                return res.json({
+                return res.status(200).json({
                     ok: true,
+                    id: usuarioDB.id,
                     usuario: usuarioDB,
                     token
-                })
+                });
 
             });
 
