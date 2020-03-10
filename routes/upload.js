@@ -6,6 +6,8 @@ const { verificaToken } = require("../middlewares/autenticacion");
 var fileUpload = require("express-fileupload");
 // Filessystem
 var fs = require("fs");
+//CORS
+const cors = require('cors');
 // Schemas
 var Hospital = require("../models/hospital");
 var Medico = require("../models/medico");
@@ -16,6 +18,9 @@ var app = express();
 
 //file upload
 app.use(fileUpload());
+
+//CORS
+app.use(cors());
 
 // ====================================
 // Rutas
@@ -89,6 +94,7 @@ app.put("/upload/:tipo/:id", (req, res, next) => {
 
     //una vez que ya esta subido el archivo =>
     //actualizar el registro en la BD y responder//
+    console.log("subiendo imagen:",tipo,id,fileName);
     subirPorTipo(tipo, id, fileName, res);
   });
 });
@@ -117,10 +123,11 @@ function subirPorTipo(tipo, id, fileName, res) {
       }
 
       var pathViejo = "./uploads/usuarios/" + usuario.img;
+      console.log("path viejo = ", pathViejo);
 
       //si existe una imagen antigua => eliminala
       if (fs.existsSync(pathViejo)) {
-        fs.unlink(pathViejo);
+        fs.unlinkSync(pathViejo);
       }
 
       //actualizo datos de la imagen del usuario
@@ -160,10 +167,11 @@ function subirPorTipo(tipo, id, fileName, res) {
 
       //si existe una imagen antigua => eliminala
       if (fs.existsSync(pathViejo)) {
-        fs.unlink(pathViejo);
+        fs.unlinkSync(pathViejo);
       }
 
       //actualizo datos de la imagen del usuario
+      console.log("vamos a actualizar medico..");
       medico.img = fileName;
       medico.save((err, medicoActualizado) => {
         return res.status(200).json({
@@ -190,17 +198,21 @@ function subirPorTipo(tipo, id, fileName, res) {
 
       //si existe una imagen antigua => eliminala
       if (fs.existsSync(pathViejo)) {
-        fs.unlink(pathViejo);
+        console.log("existe una imagen antigua en" + pathViejo + " intento borrarla");
+        fs.unlinkSync(pathViejo);
+        console.log("borrada");
       }
 
       //actualizo datos de la imagen del usuario
+      console.log("vamos a actualizar hospital");
       hospital.img = fileName;
       hospital.save((err, hospitalActualizado) => {
         return res.status(200).json({
           ok: true,
-          mensaje: "Imagen hospital actualizada",
+          mensaje: "Imagen hospital actualizada ",
           hospital: hospitalActualizado
         });
+
       });
     });
   }

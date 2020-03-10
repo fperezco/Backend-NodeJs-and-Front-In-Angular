@@ -23,7 +23,7 @@ app.get("/medicos", (req, res, next) => {
   limite = Number(limite);
 
   // listado de campos a devolver
-  Medico.find({}, "nombre hospital usuario")
+  Medico.find({}, "nombre img hospital usuario")
     .skip(desde)
     .limit(limite)
     .populate("usuario", ["nombre", "email"]) //envio tb el usuario asociado
@@ -60,6 +60,8 @@ app.post("/medicos", [verificaToken], (req, res) => {
   //npm body-parser
   let body = req.body;
 
+  console.log("creando medico");
+  console.log(body);
   //o usar try catch....
   //verificarInput(res,body);
 
@@ -159,6 +161,66 @@ app.put("/medicos/:id", [verificaToken], function(req, res) {
 
     });*/
 });
+
+/**
+ * Get un medico concreto
+ */
+app.get("/medicos/:id", [verificaToken], function(req, res) {
+  let id = req.params.id;
+
+  let body = req.body;
+  //filtramos los campos actualizables
+  //let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'password'])
+
+  Medico.findById(id)
+  .populate("hospital") //populate diciendo los campos a mostrar
+  .exec((err, medico) => {
+    if (err) {
+      return res.status(500).json({
+        ok: false,
+        mensaje: "Error server get medico",
+        errors: err
+      });
+    }
+
+    if (!medico) {
+      return res.status(404).json({
+        ok: false,
+        mensaje: "Error medico not found:" + id,
+        errors: err
+      });
+    }
+
+    //si llega a este punto si hay un medico valido para actualizar
+    res.status(200).json({
+      ok: true,
+      medico: medico
+    });
+
+
+  });
+
+  //el id, los campos, true => devuelve el registro actualizado y no el nuevo "entre llaves pk es un objeto"
+  //runvalidators para que sea de acorde a las validaciones del schema del objeto
+  /*medico.findByIdAndUpdate(id, body, { new: true, runValidators: true, context: 'query' }, (err, medicoDB) => {
+
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+
+        res.status(200).json({
+            ok: true,
+            medico: medicoDB
+        });
+
+    });*/
+});
+
+
+
 
 app.delete("/medicos/:id", [verificaToken], function(req, res) {
   let id = req.params.id;

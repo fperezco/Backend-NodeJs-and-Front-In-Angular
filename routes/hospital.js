@@ -23,7 +23,7 @@ app.get("/hospitales", (req, res, next) => {
   limite = Number(limite);
 
   // listado de campos a devolver
-  Hospital.find({}, "nombre usuario")
+  Hospital.find({}, "nombre img usuario")
     .skip(desde)
     .limit(limite)
     //populate, gracias a que en el modelo categoria pusimos el ref Usuario mongoose es capaz de inyectar aki el modelo a partir de su id
@@ -49,6 +49,47 @@ app.get("/hospitales", (req, res, next) => {
       
     });
 });
+
+
+/**
+ * Get un hospital concreto
+ */
+app.get("/hospitales/:id", [verificaToken], function(req, res) {
+  let id = req.params.id;
+
+  let body = req.body;
+  //filtramos los campos actualizables
+  //let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'password'])
+
+  Hospital.findById(id, (err, hospital) => {
+    if (err) {
+      return res.status(500).json({
+        ok: false,
+        mensaje: "Error server get hospital",
+        errors: err
+      });
+    }
+
+    if (!hospital) {
+      return res.status(404).json({
+        ok: false,
+        mensaje: "Error hospital not found:" + id,
+        errors: err
+      });
+    }
+
+    //si llega a este punto si hay un medico valido para actualizar
+    res.status(200).json({
+      ok: true,
+      hospital: hospital
+    });
+
+
+  });
+
+});
+
+
 
 /**
  * Almacenar un hospital
@@ -170,7 +211,7 @@ app.delete("/hospitales/:id", [verificaToken], function(req, res) {
         ok: false,
         mensaje: "No existe hospital con ese id",
         err: {
-          message: "No existe hospital con ese id"
+          message: "No existe hospital con ese id "
         }
       });
     }

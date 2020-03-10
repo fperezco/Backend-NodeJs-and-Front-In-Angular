@@ -22,9 +22,9 @@ app.use(fileUpload());
 // ====================================
 
 /**
- * SUBIDA DE ARCHIVOS
+ * OBTENER IMAGEN
  */
-//lo hacemos por put pk se sube foto a recursos ya exitentes
+//obtener imagen
 app.get("/imagenes/:tipo/:nbrImagen", (req, res, next) => {
   let id = req.params.nbrImagen;
   let tipo = req.params.tipo;
